@@ -17,10 +17,11 @@ import { useRouter } from "expo-router";
 import { useRef, useState } from "react";
 import Loading from "../components/loading";
 import KeyboardView from "../components/keyboard-view";
+import { useAuth } from "../context/authContext";
 
 export default function SignUp() {
   const router = useRouter();
-
+  const { register } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
 
   const emailRef = useRef("");
@@ -36,7 +37,21 @@ export default function SignUp() {
       !profileUrlRef.current
     ) {
       Alert.alert("Sign Up", "Please fill all the required fields!");
-      // Register Logic goes here
+      return;
+    }
+    setIsLoading(true);
+
+    let res = await register(
+      emailRef.current,
+      passwordRef.current,
+      usernameRef.current,
+      profileUrlRef.current
+    );
+    setIsLoading(false);
+
+    console.log("Got result: ", res);
+    if (!res.success) {
+      Alert.alert("Sign Up Error", res.msg);
     }
   };
 

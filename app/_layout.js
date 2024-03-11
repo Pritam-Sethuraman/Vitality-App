@@ -2,6 +2,7 @@ import { Slot, useSegments, useRouter } from "expo-router";
 import { AuthContextProvider, useAuth } from "../context/authContext";
 import "../global.css";
 import { useEffect } from "react";
+import { MenuProvider } from "react-native-popup-menu";
 
 const MainLayout = () => {
   const { isAuthenticated } = useAuth();
@@ -15,7 +16,7 @@ const MainLayout = () => {
     const inApp = segments[0] == "(app)";
     if (isAuthenticated && !inApp) {
       // redirect to home
-      router.replace("dashboard");
+      router.replace("home");
     } else if (isAuthenticated == false) {
       // redirect to signIn page
       router.replace("signIn");
@@ -27,8 +28,10 @@ const MainLayout = () => {
 
 export default function RootLayout() {
   return (
-    <AuthContextProvider>
-      <MainLayout />
-    </AuthContextProvider>
+    <MenuProvider>
+      <AuthContextProvider>
+        <MainLayout />
+      </AuthContextProvider>
+    </MenuProvider>
   );
 }

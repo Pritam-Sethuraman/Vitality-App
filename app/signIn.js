@@ -17,9 +17,11 @@ import { useRouter } from "expo-router";
 import { useRef, useState } from "react";
 import Loading from "../components/loading";
 import KeyboardView from "../components/keyboard-view";
+import { useAuth } from "../context/authContext";
 
 export default function SignIn() {
   const router = useRouter();
+  const { login } = useAuth();
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -29,7 +31,14 @@ export default function SignIn() {
   const handleLogin = async () => {
     if (!emailRef.current || !passwordRef.current) {
       Alert.alert("Sign In", "Please fill all the required fields!");
-      // Login Logic goes here
+    }
+
+    // Login Logic goes here
+    setIsLoading(true);
+    const res = await login(emailRef.current, passwordRef.current);
+    setIsLoading(false);
+    if (!res.success) {
+      Alert.alert("Sign In", res.msg);
     }
   };
 
