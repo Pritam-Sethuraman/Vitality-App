@@ -38,13 +38,13 @@ export default function Header() {
   return (
     <View
       style={{ paddingTop: Platform.OS == "ios" ? top : top + 10 }}
-      className="flex-row justify-between px-5 py-6 bg-indigo-400 rounded-b-3xl shadow-sm"
+      className="flex-row items-center justify-between px-5 py-8 bg-indigo-400 rounded-b-3xl shadow-sm"
     >
       <View>
         <View className="flex-row gap-1">
-          <Text style={{ fontSize: hp(2) }}>Welcome, </Text>
+          <Text style={{ fontSize: hp(2.5) }}>Welcome, </Text>
           <Text
-            style={{ fontSize: hp(2) }}
+            style={{ fontSize: hp(2.5) }}
             className="font-medium text-[#0D0D0D]"
           >
             {user?.username}!
@@ -62,7 +62,11 @@ export default function Header() {
             }}
           >
             <Image
-              style={{ height: hp(4), aspectRatio: 1, borderRadius: 100 }}
+              style={{
+                height: hp(6),
+                aspectRatio: 1,
+                borderRadius: 100,
+              }}
               source="https://github.com/shadcn.png"
               placeholder={blurhash}
               contentFit="cover"
