@@ -80,18 +80,7 @@ export default function Header() {
               value={null}
               icon={<AntDesign name="profile" size={24} color="black" />}
             />
-            <MenuItem
-              text="Acceleration"
-              action={handleAccl}
-              value={null}
-              icon={<AntDesign name="profile" size={24} color="black" />}
-            />
-            <MenuItem
-              text="Gyroscope"
-              action={handleGyro}
-              value={null}
-              icon={<AntDesign name="profile" size={24} color="black" />}
-            />
+
             <MenuItem
               text="Sign Out"
               action={handleLogout}
