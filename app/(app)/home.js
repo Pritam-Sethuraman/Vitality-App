@@ -1,23 +1,11 @@
-import {
-  View,
-  Text,
-  Button,
-  Pressable,
-  TouchableOpacity,
-  StyleSheet,
-} from "react-native";
-
-import AcclData from "../../components/accl-data";
+import { View, Text } from "react-native";
 
 export default function HomePage() {
   return (
     <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-      {/* Logout Button */}
-      <View></View>
-
       {/* Accelerometer Data */}
       <View>
-        <AcclData />
+        <Text>Welcome to Vitality!</Text>
       </View>
     </View>
   );

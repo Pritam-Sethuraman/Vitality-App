@@ -1,35 +1,22 @@
 import React, { useState, useEffect } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { DeviceMotion } from "expo-sensors";
+import { Gyroscope } from "expo-sensors";
 import { router } from "expo-router";
 
-export default function Dashboard() {
-  const [{ x, y, z }, setAccleration] = useState({
+export default function App() {
+  const [{ x, y, z }, setData] = useState({
     x: 0,
     y: 0,
     z: 0,
   });
-
-  const [{ roll, pitch, yaw }, setRotation] = useState({
-    roll: 0,
-    pitch: 0,
-    yaw: 0,
-  });
-
-  const [{ alpha, beta, gamma }, setRotationRate] = useState({
-    alpha: 0,
-    beta: 0,
-    gamma: 0,
-  });
-
   const [subscription, setSubscription] = useState(null);
 
-  const _slow = () => DeviceMotion.setUpdateInterval(1000);
-  const _fast = () => DeviceMotion.setUpdateInterval(20);
+  const _slow = () => Gyroscope.setUpdateInterval(1000);
+  const _fast = () => Gyroscope.setUpdateInterval(20);
 
   const _subscribe = () => {
     //@ts-ignore
-    setSubscription(DeviceMotion.addListener(onDeviceMotionChange));
+    setSubscription(Gyroscope.addListener(setData));
   };
 
   const _unsubscribe = () => {
@@ -43,34 +30,23 @@ export default function Dashboard() {
     return;
   };
 
-  const onDeviceMotionChange = (event) => {
-    const { x, y, z } = event.acceleration;
-    const { alpha, beta, gamma } = event.rotationRate;
-    setAccleration({ x, y, z });
-    setRotationRate({ alpha, beta, gamma });
-  };
-
   useEffect(() => {
     _subscribe();
     return () => _unsubscribe();
   }, []);
+
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>
-        Accelerometer: (in gs where 1g = 9.81 m/s^2)
-      </Text>
+      <Text style={styles.text}>Gyroscope:</Text>
       <Text style={styles.text}>x: {x}</Text>
       <Text style={styles.text}>y: {y}</Text>
       <Text style={styles.text}>z: {z}</Text>
-      <Text style={styles.text}>alpha: {alpha}</Text>
-      <Text style={styles.text}>beta: {beta}</Text>
-      <Text style={styles.text}>gamma: {gamma}</Text>
       <View style={styles.buttonContainer}>
         <TouchableOpacity
           onPress={subscription ? _unsubscribe : _subscribe}
           style={styles.button}
         >
-          <Text>{subscription ? "Off" : "On"}</Text>
+          <Text>{subscription ? "On" : "Off"}</Text>
         </TouchableOpacity>
         <TouchableOpacity
           onPress={_slow}

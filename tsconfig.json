@@ -15,6 +15,9 @@
     "app/(tabs)/_layout.js",
     "app/(tabs)/index.js",
     "app/(tabs)/dashboard.js",
-    "components/accl-data.jsx"
+    "components/accl-data.jsx",
+    "app/(app)/dashboard.jsx",
+    "app/index.js",
+    "app/(app)/dashboard.jsx"
   ]
 }

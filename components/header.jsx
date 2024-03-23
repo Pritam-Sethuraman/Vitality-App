@@ -9,6 +9,7 @@ import { useAuth } from "../context/authContext";
 import { Menu, MenuOptions, MenuTrigger } from "react-native-popup-menu";
 import MenuItem from "./menu-item";
 import { AntDesign } from "@expo/vector-icons";
+import { router } from "expo-router";
 
 const blurhash =
   "|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[";
@@ -21,17 +22,27 @@ export default function Header() {
     await logout();
   };
 
-  const handleProfile = () => {
+  const handleDashboard = () => {
+    router.replace("/dashboard");
     return;
   };
+  const handleAccl = () => {
+    router.replace("/accl-dashboard");
+    return;
+  };
+  const handleGyro = () => {
+    router.replace("/gyro-dashboard");
+    return;
+  };
+
   return (
     <View
       style={{ paddingTop: Platform.OS == "ios" ? top : top + 10 }}
-      className="flex-row justify-between px-5 py-3 bg-indigo-400 rounded-b-3xl shadow-sm"
+      className="flex-row justify-between px-5 py-6 bg-indigo-400 rounded-b-3xl shadow-sm"
     >
       <View>
         <View className="flex-row gap-1">
-          <Text style={{ fontSize: hp(2) }}>Welcome,</Text>
+          <Text style={{ fontSize: hp(2) }}>Welcome, </Text>
           <Text
             style={{ fontSize: hp(2) }}
             className="font-medium text-[#0D0D0D]"
@@ -60,8 +71,20 @@ export default function Header() {
           </MenuTrigger>
           <MenuOptions>
             <MenuItem
-              text="Profile"
-              action={handleProfile}
+              text="Dashboard"
+              action={handleDashboard}
+              value={null}
+              icon={<AntDesign name="profile" size={24} color="black" />}
+            />
+            <MenuItem
+              text="Acceleration"
+              action={handleAccl}
+              value={null}
+              icon={<AntDesign name="profile" size={24} color="black" />}
+            />
+            <MenuItem
+              text="Gyroscope"
+              action={handleGyro}
               value={null}
               icon={<AntDesign name="profile" size={24} color="black" />}
             />
