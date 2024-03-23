@@ -2,28 +2,16 @@ import React, { useState, useEffect } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import { DeviceMotion } from "expo-sensors";
 import { router } from "expo-router";
-import * as FileSystem from "expo-file-system";
 import axios from "axios";
 
 export default function Dashboard() {
-  const [acceleration, setAcceleration] = useState({ x: 0, y: 0, z: 0 });
-  const [rotationRate, setRotationRate] = useState({
-    alpha: null,
-    beta: null,
-    gamma: null,
-  });
-  const [rotation, setRotation] = useState({ roll: 0, pitch: 0, yaw: 0 });
-  const [userAcceleration, setUserAcceleration] = useState({
-    x: 0,
-    y: 0,
-    z: 0,
-  });
   const [subscription, setSubscription] = useState(null);
 
-  const _slow = () => DeviceMotion.setUpdateInterval(1000);
-  const _fast = () => DeviceMotion.setUpdateInterval(2000);
+  const [motionData, setMotionData] = useState([]);
+  const [responseData, setResponseData] = useState(null);
 
   const _subscribe = () => {
+    DeviceMotion.setUpdateInterval(20); // 50 Hz
     setSubscription(DeviceMotion.addListener(onDeviceMotionChange));
   };
 
@@ -36,99 +24,72 @@ export default function Dashboard() {
   };
 
   const handlePost = async () => {
-    const gravity = {
-      x: acceleration.x - userAcceleration.x,
-      y: acceleration.y - userAcceleration.y,
-      z: acceleration.z - userAcceleration.z,
-    };
-
-    const data = {
-      "attitude.roll": rotation.roll,
-      "attitude.pitch": rotation.pitch,
-      "attitude.yaw": rotation.yaw,
-      "gravity.x": gravity.x,
-      "gravity.y": gravity.y,
-      "gravity.z": gravity.z,
-      "rotationRate.x": rotationRate.alpha,
-      "rotationRate.y": rotationRate.beta,
-      "rotationRate.z": rotationRate.gamma,
-      "userAcceleration.x": userAcceleration.x,
-      "userAcceleration.y": userAcceleration.y,
-      "userAcceleration.z": userAcceleration.z,
-    };
-
-    const apiUrl = "http://140.238.158.223:8080/analyze-data";
-    try {
-      const response = await axios.post(apiUrl, data);
-      console.log(response.data);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const saveDataToCSV = async (data) => {
-    const { acceleration, rotationRate, rotation, userAcceleration } = data;
-    const csvData = `timestamp,acceleration_x,acceleration_y,acceleration_z,rotation_rate_alpha,rotation_rate_beta,rotation_rate_gamma,rotation_roll,rotation_pitch,rotation_yaw,user_acceleration_x,user_acceleration_y,user_acceleration_z\n`;
-    const rowData = `${new Date().getTime()},${acceleration.x},${
-      acceleration.y
-    },${acceleration.z},${rotationRate.alpha},${rotationRate.beta},${
-      rotationRate.gamma
-    },${rotation.roll},${rotation.pitch},${rotation.yaw},${
-      userAcceleration.x
-    },${userAcceleration.y},${userAcceleration.z}\n`;
-
-    const csvFilePath = FileSystem.documentDirectory + "motion_data.csv";
+    const apiUrl = "http://47.243.206.82:8080/analyze-data";
 
     try {
-      await FileSystem.writeAsStringAsync(csvFilePath, csvData, {
-        encoding: FileSystem.EncodingType.UTF8,
-        append: !!(await FileSystem.getInfoAsync(csvFilePath)).exists,
-      });
-      await FileSystem.appendAsStringAsync(csvFilePath, rowData, {
-        encoding: FileSystem.EncodingType.UTF8,
-      });
+      const response = await axios.post(apiUrl, motionData);
+      setResponseData(response.data);
+      console.log("Response: ", response.data);
     } catch (error) {
-      console.error("Error writing to CSV:", error);
+      console.error("Error sending POST request to API:", error);
     }
   };
 
   const onDeviceMotionChange = (event) => {
     const {
-      acceleration,
+      accelerationIncludingGravity,
       rotationRate,
       rotation,
-      accelerationIncludingGravity,
+      acceleration,
     } = event;
-    console.log(event);
 
-    if (accelerationIncludingGravity) {
-      setAcceleration(accelerationIncludingGravity);
-    }
+    if (
+      accelerationIncludingGravity &&
+      rotationRate &&
+      rotation &&
+      acceleration
+    ) {
+      const newDataPoint = {
+        "attitude.roll": rotation.alpha,
+        "attitude.pitch": rotation.beta,
+        "attitude.yaw": rotation.gamma,
+        "gravity.x": accelerationIncludingGravity.x - acceleration.x,
+        "gravity.y": accelerationIncludingGravity.y - acceleration.y,
+        "gravity.z": accelerationIncludingGravity.z - acceleration.z,
+        "rotationRate.x": rotationRate.alpha,
+        "rotationRate.y": rotationRate.beta,
+        "rotationRate.z": rotationRate.gamma,
+        "userAcceleration.x": acceleration.x,
+        "userAcceleration.y": acceleration.y,
+        "userAcceleration.z": acceleration.z,
+      };
 
-    if (rotationRate) {
-      setRotationRate(rotationRate);
-    }
-
-    if (rotation) {
-      setRotation({
-        roll: rotation.alpha,
-        pitch: rotation.beta,
-        yaw: rotation.gamma,
-      });
-    }
-
-    if (acceleration) {
-      setUserAcceleration(acceleration);
+      setMotionData((prevData) => [...prevData, newDataPoint]);
     }
   };
 
-  // useEffect(() => {
-  //   _subscribe();
-  //   return () => _unsubscribe();
-  // }, []);
-
   return (
     <View className="flex flex-1 justify-center px-5">
+      {/* Display response data */}
+      {responseData && (
+        <View className="items-center">
+          <Text>Response from API:</Text>
+          {/* Check if evaluation_results exists */}
+          {responseData.evaluation_results && (
+            <View>
+              <Text>Recovery Percentage:</Text>
+              <Text>
+                {responseData.evaluation_results.actual_similarity_percentage}
+              </Text>
+
+              <Text>Stage:</Text>
+              <Text>
+                {responseData.evaluation_results.recovery_category_by_stage}
+              </Text>
+            </View>
+          )}
+        </View>
+      )}
       {subscription ? (
         <View className="my-3 items-center gap-3">
           <Text className="text-center my-5">Sensing Data...</Text>
@@ -172,18 +133,7 @@ export default function Dashboard() {
           >
             <Text>Off</Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            onPress={_slow}
-            className="flex items-center bg-indigo-200 rounded-2xl w-40 py-3"
-          >
-            <Text>Slow</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={_fast}
-            className="flex items-center bg-indigo-200 rounded-2xl w-40 py-3"
-          >
-            <Text>Fast</Text>
-          </TouchableOpacity>
+
           <TouchableOpacity
             onPress={handleHome}
             className="flex items-center bg-indigo-200 rounded-2xl w-40 py-3"
@@ -212,6 +162,12 @@ export default function Dashboard() {
             className="flex items-center bg-indigo-200 rounded-2xl w-40 py-3"
           >
             <Text>Home</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={handlePost}
+            className="flex items-center bg-indigo-200 rounded-2xl w-40 py-3"
+          >
+            <Text>POST</Text>
           </TouchableOpacity>
         </View>
       )}
