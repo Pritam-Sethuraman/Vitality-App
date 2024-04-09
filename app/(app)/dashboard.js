@@ -19,9 +19,6 @@ export default function Dashboard() {
     subscription && subscription.remove();
     setSubscription(null);
   };
-  const handleHome = () => {
-    router.replace("/home");
-  };
 
   const handlePost = async () => {
     const apiUrl = "http://47.243.206.82:8080/analyze-data";
@@ -69,31 +66,39 @@ export default function Dashboard() {
   };
 
   return (
-    <View className="flex flex-1 justify-center px-5">
+    <View className="flex-1 justify-between px-5 mt-14">
       {/* Display response data */}
       {responseData && (
-        <View className="items-center">
-          <Text>Response from API:</Text>
+        <View className="items-center text-3xl">
+          <Text>Analysis Results</Text>
           {/* Check if evaluation_results exists */}
           {responseData.evaluation_results && (
-            <View>
-              <Text>Recovery Percentage:</Text>
-              <Text>
-                {responseData.evaluation_results.actual_similarity_percentage}
-              </Text>
+            <View className="flex-col">
+              <View className="flex-row justify-between">
+                <Text className="text-3xl">
+                  You are{" "}
+                  <Text className="font-bold">
+                    {responseData.evaluation_results.actual_similarity_percentage.toFixed(
+                      2
+                    )}
+                    %
+                  </Text>{" "}
+                  recovered
+                </Text>
+              </View>
 
-              <Text>Stage:</Text>
-              <Text>
-                {responseData.evaluation_results.recovery_category_by_stage}
-              </Text>
+              {/* <View className="flex-row justify-between">
+                <Text>Stage: </Text>
+                <Text>
+                  {responseData.evaluation_results.recovery_category_by_stage}
+                </Text>
+              </View> */}
             </View>
           )}
         </View>
       )}
       {subscription ? (
         <View className="my-3 items-center gap-3">
-          <Text className="text-center my-5">Sensing Data...</Text>
-
           {/* Displaying Device Motion */}
           {/* <View className="my-3 items-center gap-3">
             <Text className="text-center">Device Motion</Text>
@@ -135,21 +140,15 @@ export default function Dashboard() {
           </TouchableOpacity>
 
           <TouchableOpacity
-            onPress={handleHome}
-            className="flex items-center bg-indigo-200 rounded-2xl w-40 py-3"
-          >
-            <Text>Home</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
             onPress={handlePost}
             className="flex items-center bg-indigo-200 rounded-2xl w-40 py-3"
           >
             <Text>POST</Text>
           </TouchableOpacity>
+          <Text className="text-center my-5">Sensing Data...</Text>
         </View>
       ) : (
         <View className="my-3 items-center gap-3">
-          <Text className="text-center my-5">Not Sensing Data</Text>
           <TouchableOpacity
             onPress={_subscribe}
             className="flex items-center bg-indigo-200 rounded-2xl w-40 py-3"
@@ -158,17 +157,13 @@ export default function Dashboard() {
           </TouchableOpacity>
 
           <TouchableOpacity
-            onPress={handleHome}
-            className="flex items-center bg-indigo-200 rounded-2xl w-40 py-3"
-          >
-            <Text>Home</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
             onPress={handlePost}
             className="flex items-center bg-indigo-200 rounded-2xl w-40 py-3"
           >
             <Text>POST</Text>
           </TouchableOpacity>
+
+          <Text className="text-center my-5">Not Sensing Data</Text>
         </View>
       )}
     </View>

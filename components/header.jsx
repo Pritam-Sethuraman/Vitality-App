@@ -8,7 +8,7 @@ import { Image } from "expo-image";
 import { useAuth } from "../context/authContext";
 import { Menu, MenuOptions, MenuTrigger } from "react-native-popup-menu";
 import MenuItem from "./menu-item";
-import { AntDesign } from "@expo/vector-icons";
+import { AntDesign, Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 
 const blurhash =
@@ -26,12 +26,9 @@ export default function Header() {
     router.replace("/dashboard");
     return;
   };
-  const handleAccl = () => {
-    router.replace("/accl-dashboard");
-    return;
-  };
-  const handleGyro = () => {
-    router.replace("/gyro-dashboard");
+
+  const handleChat = () => {
+    router.replace("/chat");
     return;
   };
 
@@ -74,13 +71,6 @@ export default function Header() {
             />
           </MenuTrigger>
           <MenuOptions>
-            <MenuItem
-              text="Dashboard"
-              action={handleDashboard}
-              value={null}
-              icon={<AntDesign name="profile" size={24} color="black" />}
-            />
-
             <MenuItem
               text="Sign Out"
               action={handleLogout}
