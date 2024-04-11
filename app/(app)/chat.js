@@ -18,7 +18,7 @@ export default function ChatPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const API_KEY = "";
+  const API_KEY = "YOUR_API_KEY";
 
   const handleUserInput = async () => {
     const keywords = ["exercise", "recovery", "leg", "workout"]; // Add more keywords as needed
